@@ -1,0 +1,131 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelfont{rm}{Noto Sans}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\setlist[itemize]{label=--}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{20, 45, 85}
+
+\begin{document}
+
+% ------------------- PORTADA ACADÉMICA -------------------
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge \bfseries \color{primary} INVESTIGACIÓN DE OPERACIONES}\\[1.5cm]
+    
+    {\Large \bfseries RESUMEN TÉCNICO Y METODOLÓGICO}\\[2.5cm]
+    
+    \begin{minipage}{0.8\textwidth}
+        \centering
+        \large
+        \textbf{Maestro:}\\[0.2cm]
+        Julio César Galindo López\\[1.5cm]
+        
+        \textbf{Estudiante:}\\[0.2cm]
+        Aranzolo Rios Angel Ariadna\\
+    \end{minipage}
+    
+    \vfill
+    
+    {\large \today}
+    \vspace*{1.5cm}
+\end{titlepage}
+
+\newpage
+\pagenumbering{arabic}
+
+% ------------------- CONTENIDO DEL RESUMEN -------------------
+
+\section{Formulación de Modelos Lineales}
+
+Un modelo lineal responde a tres preguntas básicas: ¿qué se decide?, ¿qué se quiere lograr? y ¿qué límites no se pueden cruzar?
+
+\subsection*{Receta de 6 pasos}
+\begin{enumerate}
+    \item Describir la decisión y sus unidades de medida.
+    \item Definir una variable de decisión por cada incógnita ($x_1, x_2, \dots, x_n$).
+    \item Formular la función objetivo: optimizar $Z = c_1 x_1 + \dots + c_n x_n$ (maximizar beneficio o minimizar costo).
+    \item Expresar cada límite como una restricción lineal.
+    \item Añadir las condiciones de no negatividad ($x_i \ge 0$).
+    \item Comprobar dimensiones, coherencia de unidades y sentido práctico del planteamiento.
+\end{enumerate}
+
+\section{Matrices para Organizar Información}
+
+Permiten manejar sistemas grandes de forma compacta mediante la estructura matricial $AX = B$, donde $A$ representa la matriz de coeficientes, $X$ el vector de incógnitas y $B$ el vector de términos independientes.
+
+\subsection*{Operaciones clave}
+\begin{itemize}
+    \item \textbf{Suma y resta:} Requieren matrices de idénticas dimensiones ($m \times n$).
+    \item \textbf{Producto ($AB$):} Exige que el número de columnas de $A$ coincida estrictamente con el número de filas de $B$.
+    \item \textbf{Transpuesta ($A^T$):} Intercambia filas por columnas.
+    \item \textbf{Resolución de sistemas:} Se estructura la matriz aumentada $[A \mid B]$ y se aplican operaciones elementales de Gauss (intercambiar filas, multiplicar una fila por un escalar no nulo y sumar a una fila el múltiplo de otra).
+\end{itemize}
+
+\section{Preparación de un Modelo para Simplex}
+
+El método Simplex trabaja exclusivamente con igualdades, por lo que las desigualdades deben transformarse mediante variables auxiliares con interpretación económica:
+
+\begin{itemize}
+    \item \textbf{Variables de holgura ($s \ge 0$):} Se suman en restricciones del tipo $\le$ ($a^T x + s = b$). Representan recursos no utilizados; si su valor final es cero, el recurso asociado se agotó completamente.
+    \item \textbf{Variables de exceso ($e \ge 0$):} Se restan en restricciones del tipo $\ge$ ($a^T x - e = b$). Representan cuánto se supera un valor mínimo requerido.
+    \item \textbf{Variables artificiales ($a \ge 0$):} Se incorporan en restricciones de igualdad ($=$) o con exceso ($\ge$) para proveer una columna identidad que sirva como base inicial. No representan decisiones reales y deben salir de la base (valer cero) antes de declarar factible la solución.
+    \item \textbf{Método de la Gran M:} Penaliza las variables artificiales en la función objetivo asignándoles un coeficiente $M > 0$ sumamente grande ($+M$ en minimización) para obligarlas a abandonar la base durante el proceso iterativo.
+\end{itemize}
+
+\section{Rutina y Lectura de la Tabla Simplex}
+
+La tabla se evalúa mediante la fila de costos reducidos ($C_j - Z_j$, donde $Z_j = \sum C_{B_i} a_{ij}$):
+
+\subsection*{Criterios de decisión}
+\begin{itemize}
+    \item \textbf{Criterio de entrada:}
+    \begin{itemize}
+        \item En \textbf{maximización}, entra la variable con el mayor costo reducido positivo ($C_j - Z_j > 0$).
+        \item En \textbf{minimización}, entra la variable con el costo reducido más negativo ($C_j - Z_j < 0$).
+    \end{itemize}
+    \item \textbf{Criterio de salida (fila pivote):} Se determina por la razón mínima positiva $\theta = \frac{b_i}{a_{ik}}$, considerando únicamente coeficientes estrictamente positivos en la columna pivote ($a_{ik} > 0$).
+\end{itemize}
+
+\subsection*{Actualización (pivoteo)}
+\begin{enumerate}
+    \item Se normaliza la fila pivote dividiéndola entre el elemento pivote.
+    \item Se hacen ceros en las demás filas de la columna pivote aplicando sumas de múltiplos adecuados de la fila pivote.
+    \item Se recalculan $Z_j$ y los costos reducidos $C_j - Z_j$.
+    \item \textbf{Criterio de parada:} Se detiene el algoritmo cuando ningún costo reducido permite mejorar la función objetivo ($\le 0$ en maximización; $\ge 0$ en minimización). Los valores de las variables básicas se leen en la columna $b$ y las no básicas equivalen a cero.
+\end{enumerate}
+
+\section{Situaciones Especiales}
+
+\begin{itemize}
+    \item \textbf{Óptimos múltiples:} Ocurre si una variable no básica tiene costo reducido cero en la tabla óptima; puede entrar a la base sin modificar el valor óptimo de $Z$.
+    \item \textbf{Degeneración:} Empate en la razón mínima que provoca que alguna variable básica tome valor cero, existiendo riesgo de ciclar sin avanzar.
+    \item \textbf{No factibilidad:} La tabla final cumple la condición de óptimo pero mantiene una variable artificial básica con valor positivo, indicando incompatibilidad en las restricciones.
+    \item \textbf{No acotación:} La columna de la variable entrante carece de coeficientes positivos; la variable puede incrementarse indefinidamente y la función objetivo no tiene cota finita.
+\end{itemize}
+
+\section{Comprobación Final y Aplicación Práctica}
+
+\subsection*{Lista de verificación}
+\begin{enumerate}
+    \item Sustituir los valores obtenidos en las restricciones originales del problema.
+    \item Confirmar el cumplimiento estricto de las condiciones de no negatividad y la coherencia de unidades.
+    \item Recalcular de forma directa el valor de la función objetivo.
+    \item Identificar e interpretar qué recursos se agotaron (holguras nulas) y cuáles quedaron con excedente.
+\end{enumerate}
+
+\subsection*{Soluciones continuas frente a enteras}
+Si la decisión implica unidades indivisibles (como mobiliario o computadoras), la solución continua del método Simplex no debe redondearse al azar. Es necesario plantear un modelo de programación entera o analizar y justificar explícitamente cualquier redondeo para garantizar que ninguna restricción sea violada.
+
+\end{document}
